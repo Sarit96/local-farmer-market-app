@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'; // Import FormsModule for template-driven forms
 import { CommonModule } from '@angular/common';
+import { MaterialModule } from '../material-module';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.html',
   styleUrls: ['./register.component.scss'],
-  imports: [FormsModule, CommonModule]
+  imports: [FormsModule, CommonModule, MaterialModule]
 })
 export class RegisterComponent {
   user = {

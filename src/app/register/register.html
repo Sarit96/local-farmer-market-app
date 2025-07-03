@@ -1,50 +1,64 @@
-<form (ngSubmit)="register()" #registerForm="ngForm">
-  <div>
-    <label for="username">Username</label>
-    <input
-      type="text"
-      id="username"
-      name="username"
-      [(ngModel)]="user.username"
-      required
-      #username="ngModel"
-    />
-    <div *ngIf="username.invalid && username.touched" style="color: red;">
-      Username is required.
-    </div>
-  </div>
+<div class="register-page mat-app-background">
+  <mat-toolbar color="primary" class="register-toolbar">
+    Local Farmer Market&nbsp;—&nbsp;Register
+  </mat-toolbar>
 
-  <div>
-    <label for="email">Email</label>
-    <input
-      type="email"
-      id="email"
-      name="email"
-      [(ngModel)]="user.email"
-      required
-      email
-      #email="ngModel"
-    />
-    <div *ngIf="email.invalid && email.touched" style="color: red;">
-      Valid email is required.
-    </div>
-  </div>
+  <!-- Center everything -->
+  <section class="register-wrapper">
+    <mat-card class="register-card mat-elevation-z4">
 
-  <div>
-    <label for="password">Password</label>
-    <input
-      type="password"
-      id="password"
-      name="password"
-      [(ngModel)]="user.password"
-      required
-      minlength="6"
-      #password="ngModel"
-    />
-    <div *ngIf="password.invalid && password.touched" style="color: red;">
-      Password is required (min 6 characters).
-    </div>
-  </div>
+      <h1 class="mat-headline-4 text-center">Create Account</h1>
+      <p  class="mat-subtitle-1 text-center mb-3">
+        Join the local farmer community
+      </p>
 
-  <button type="submit" [disabled]="registerForm.invalid">Register</button>
-</form> 
+      <form #registerForm="ngForm"
+            (ngSubmit)="register()"
+            autocomplete="off">
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Username</mat-label>
+          <input  matInput  name="username"
+                  required
+                  autocomplete="username"
+                  [(ngModel)]="user.username"
+                  #u="ngModel">
+          <mat-error *ngIf="u.invalid && u.touched">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Email</mat-label>
+          <input  matInput  type="email" name="email"
+                  required email
+                  autocomplete="email"
+                  [(ngModel)]="user.email"
+                  #e="ngModel">
+          <mat-error *ngIf="e.invalid && e.touched">
+            Enter a valid email
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Password</mat-label>
+          <input  matInput  type="password" name="password"
+                  required minlength="6"
+                  autocomplete="new-password"
+                  [(ngModel)]="user.password"
+                  #p="ngModel">
+          <mat-error *ngIf="p.invalid && p.touched">
+            Minimum 6 characters
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-raised-button
+                color="primary"
+                class="register-btn"
+                [disabled]="registerForm.invalid">
+          Register
+        </button>
+      </form>
+    </mat-card>
+  </section>
+</div>
