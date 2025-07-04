@@ -59,6 +59,14 @@
           Register
         </button>
       </form>
+      <div *ngIf="registrationMessage" class="registration-message" style="margin-top: 16px; text-align: center;">
+        <mat-card [ngClass]="{'success': registrationMessage === 'Registration successful!', 'error': registrationMessage !== 'Registration successful!'}">
+          {{ registrationMessage }}
+        </mat-card>
+      </div>
+      <div class="toggle-link text-center" style="margin-top: 16px;">
+        <a routerLink="/login">Already have an account? Login</a>
+      </div>
     </mat-card>
   </section>
 </div>

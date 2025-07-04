@@ -1,0 +1,53 @@
+<div class="login-page mat-app-background">
+  <mat-toolbar color="primary" class="login-toolbar">
+    Local Farmer Market&nbsp;—&nbsp;Login
+  </mat-toolbar>
+  <section class="login-wrapper">
+    <mat-card class="login-card mat-elevation-z4">
+      <h1 class="mat-headline-4 text-center">Login</h1>
+      <p class="mat-subtitle-1 text-center mb-3">
+        Welcome back to the local farmer community
+      </p>
+      <form #loginForm="ngForm"
+            (ngSubmit)="login()"
+            autocomplete="off">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" name="email"
+                 required email
+                 autocomplete="email"
+                 [(ngModel)]="credentials.email"
+                 #e="ngModel">
+          <mat-error *ngIf="e.invalid && e.touched">
+            Enter a valid email
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" name="password"
+                 required minlength="6"
+                 autocomplete="current-password"
+                 [(ngModel)]="credentials.password"
+                 #p="ngModel">
+          <mat-error *ngIf="p.invalid && p.touched">
+            Minimum 6 characters
+          </mat-error>
+        </mat-form-field>
+        <button mat-raised-button
+                color="primary"
+                class="login-btn"
+                [disabled]="loginForm.invalid">
+          Login
+        </button>
+      </form>
+      <div *ngIf="loginMessage" class="login-message" style="margin-top: 16px; text-align: center;">
+        <mat-card [ngClass]="{'success': loginMessage === 'Login successful!', 'error': loginMessage !== 'Login successful!'}">
+          {{ loginMessage }}
+        </mat-card>
+      </div>
+      <div class="toggle-link text-center" style="margin-top: 16px;">
+        <a routerLink="/register">Don't have an account? Register</a>
+      </div>
+    </mat-card>
+  </section>
+</div> 
