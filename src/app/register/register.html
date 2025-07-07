@@ -52,6 +52,17 @@
           </mat-error>
         </mat-form-field>
 
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Role</mat-label>
+          <mat-select name="role" required [(ngModel)]="user.role">
+            <mat-option value="farmer">Farmer</mat-option>
+            <mat-option value="customer">Customer</mat-option>
+          </mat-select>
+          <mat-error *ngIf="!user.role && registerForm.submitted">
+            Role is required
+          </mat-error>
+        </mat-form-field>
+
         <button mat-raised-button
                 color="primary"
                 class="register-btn"
