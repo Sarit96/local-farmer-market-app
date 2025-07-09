@@ -71,9 +71,12 @@
         </button>
       </form>
       <div *ngIf="registrationMessage" class="registration-message" style="margin-top: 16px; text-align: center;">
-        <mat-card [ngClass]="{'success': registrationMessage === 'Registration successful!', 'error': registrationMessage !== 'Registration successful!'}">
+        <mat-card [ngClass]="{'success': registrationMessage.startsWith('Registration successful!'), 'error': !registrationMessage.startsWith('Registration successful!')}">
           {{ registrationMessage }}
         </mat-card>
+        <div *ngIf="registrationMessage.startsWith('Registration successful!')" style="margin-top: 8px;">
+          <a mat-button color="primary" routerLink="/login">Go to Login</a>
+        </div>
       </div>
       <div class="toggle-link text-center" style="margin-top: 16px;">
         <a routerLink="/login">Already have an account? Login</a>
