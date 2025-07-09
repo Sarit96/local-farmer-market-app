@@ -23,15 +23,28 @@ export class LoginComponent {
   constructor(private http: HttpClient, private router: Router) { }
 
   login() {
-    this.http.post('http://localhost:5000/api/users/login', this.credentials).subscribe(
+    this.http.post<any>('http://localhost:5000/api/users/login', this.credentials).subscribe(
       response => {
         console.log('User logged in:', response);
         this.loginMessage = 'Login successful!';
-        this.router.navigate(['/home']);
+        if (response.role === 'farmer') {
+          localStorage.setItem('farmerId', response.userId);
+          this.router.navigate(['/farmer-dashboard']);
+        } else if (response.role === 'customer') {
+          this.router.navigate(['/home']);
+        } else {
+          this.router.navigate(['/home']);
+        }
       },
       error => {
         console.error('Login error:', error);
-        this.loginMessage = 'Login failed. Please try again.';
+        if (error.status === 404) {
+          this.loginMessage = 'User not found. Please register.';
+        } else if (error.status === 401) {
+          this.loginMessage = 'Invalid credentials. Please try again or register.';
+        } else {
+          this.loginMessage = 'Login failed. Please try again.';
+        }
       }
     );
   }

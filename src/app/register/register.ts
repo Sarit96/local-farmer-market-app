@@ -28,7 +28,7 @@ export class RegisterComponent {
     this.http.post('http://localhost:5000/api/users/register', this.user).subscribe(
       response => {
         console.log('User registered:', response);
-        this.registrationMessage = 'Registration successful!';
+        this.registrationMessage = 'Registration successful! You can now log in.';
       },
       error => {
         console.error('Registration error:', error);
