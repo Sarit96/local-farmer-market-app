@@ -11,4 +11,8 @@ export class ProductService {
   getProductsByFarmer(farmerId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}?farmer=${farmerId}`);
   }
+
+  addProduct(product: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, product);
+  }
 } 
