@@ -3,13 +3,20 @@ import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material-module';
 import { ProductService } from './product.service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-farmer-dashboard',
   standalone: true,
   template: `
+    <div class="dashboard-hero">
+      <h1>🌾 Farmer Dashboard</h1>
+      <p>Welcome! Manage your products and grow your business with ease.</p>
+    </div>
     <div class="dashboard-container">
       <h2>My Products</h2>
+      <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
       <button mat-raised-button color="primary" (click)="openAddProduct()">Add Product</button>
       <form *ngIf="showAddForm" (ngSubmit)="submitAddProduct()" #addProductForm="ngForm" class="add-product-form">
         <mat-form-field appearance="fill">
@@ -62,23 +69,48 @@ import { FormsModule } from '@angular/forms';
     </div>
   `,
   styles: [`
+    .dashboard-hero {
+      background: linear-gradient(120deg, #43cea2 0%, #185a9d 100%);
+      color: #fff;
+      padding: 40px 0 24px 0;
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 24px rgba(24,90,157,0.12);
+    }
     .dashboard-container {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 24px;
+      max-width: 950px;
+      margin: 0 auto;
+      padding: 32px 32px 24px 32px;
       background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+      position: relative;
+      top: -40px;
     }
     h2 {
       margin-bottom: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #185a9d;
     }
     .product-table {
       width: 100%;
       margin-top: 24px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+    .mat-header-row, .mat-row {
+      transition: background 0.2s;
+    }
+    .mat-row:hover {
+      background: #e3f2fd;
     }
     button[mat-raised-button] {
       margin-bottom: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
     .add-product-form {
       display: flex;
@@ -86,10 +118,31 @@ import { FormsModule } from '@angular/forms';
       margin-bottom: 24px;
       flex-wrap: wrap;
       align-items: center;
+      background: #f1f8e9;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(67,206,162,0.08);
     }
     .add-product-form mat-form-field {
       flex: 1 1 180px;
       min-width: 120px;
+    }
+    .success-message {
+      color: #388e3c;
+      margin-bottom: 16px;
+      font-weight: bold;
+      background: #e8f5e9;
+      padding: 8px 16px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(56,142,60,0.08);
+      display: inline-block;
+    }
+    .mat-icon-button {
+      transition: background 0.2s;
+      border-radius: 50%;
+    }
+    .mat-icon-button:hover {
+      background: #e3f2fd;
     }
   `],
   imports: [CommonModule, MaterialModule, FormsModule]
@@ -100,10 +153,18 @@ export class FarmerDashboardComponent implements OnInit {
 
   showAddForm = false;
   newProduct: any = { name: '', category: '', price: null, quantity: null };
+  successMessage: string = '';
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
+    let farmerId = localStorage.getItem('farmerId');
+    if (!farmerId) {
+      // Prompt user to log in if farmerId is missing
+      alert('Please log in as a farmer to view your dashboard.');
+      this.router.navigate(['/login']);
+      return;
+    }
     this.loadProducts();
   }
 
@@ -111,7 +172,11 @@ export class FarmerDashboardComponent implements OnInit {
     const farmerId = localStorage.getItem('farmerId') || '';
     if (farmerId) {
       this.productService.getProductsByFarmer(farmerId).subscribe(
-        (products) => this.products = products,
+        (products) => {
+          console.log('Fetched products for farmer', farmerId, products);
+          this.products = products;
+          this.cdr.detectChanges();
+        },
         (error) => console.error('Failed to fetch products:', error)
       );
     }
@@ -128,16 +193,20 @@ export class FarmerDashboardComponent implements OnInit {
   }
 
   submitAddProduct() {
-    const farmerId = localStorage.getItem('farmerId') || '';
+    let farmerId = localStorage.getItem('farmerId');
     if (!farmerId) {
       alert('Farmer ID not found. Please log in again.');
+      this.router.navigate(['/login']);
       return;
     }
     const productToAdd = { ...this.newProduct, farmer: farmerId };
+    console.log('Adding product:', productToAdd);
     this.productService.addProduct(productToAdd).subscribe(
       (savedProduct) => {
         this.showAddForm = false;
         this.loadProducts();
+        this.successMessage = 'Product added successfully!';
+        setTimeout(() => this.successMessage = '', 3000);
       },
       (error) => {
         alert('Failed to add product: ' + (error.error?.error || error.message));
@@ -151,7 +220,11 @@ export class FarmerDashboardComponent implements OnInit {
   }
 
   deleteProduct(product: any) {
-    // TODO: Delete product logic
-    alert('Delete Product: ' + product.name);
+    if (confirm(`Are you sure you want to delete the product: ${product.name}?`)) {
+      this.productService.deleteProduct(product._id).subscribe(
+        () => this.loadProducts(),
+        (error) => alert('Failed to delete product: ' + (error.error?.error || error.message))
+      );
+    }
   }
 } 
