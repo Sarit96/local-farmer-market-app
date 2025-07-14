@@ -5,6 +5,53 @@ import { ProductService } from './product.service';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+// EditProductDialogComponent must be declared before FarmerDashboardComponent
+@Component({
+  selector: 'edit-product-dialog',
+  standalone: true,
+  imports: [MaterialModule, FormsModule],
+  template: `
+    <h2 mat-dialog-title>Edit Product</h2>
+    <form (ngSubmit)="save()" #editForm="ngForm" class="add-product-form">
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="data.name" required />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Category</mat-label>
+        <mat-select name="category" [(ngModel)]="data.category" required>
+          <mat-option value="Fruits">Fruits</mat-option>
+          <mat-option value="Vegetables">Vegetables</mat-option>
+          <mat-option value="Dairy">Dairy</mat-option>
+          <mat-option value="Homemade Goods">Homemade Goods</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Price</mat-label>
+        <input matInput type="number" name="price" [(ngModel)]="data.price" required min="0" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Quantity</mat-label>
+        <input matInput type="number" name="quantity" [(ngModel)]="data.quantity" required min="0" />
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid">Save</button>
+      <button mat-button type="button" (click)="close()">Cancel</button>
+    </form>
+  `,
+  styles: [`.add-product-form { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; background: #f1f8e9; padding: 16px; border-radius: 8px; box-shadow: 0 1px 4px rgba(67,206,162,0.08); } .add-product-form mat-form-field { flex: 1 1 180px; min-width: 120px; }`]
+})
+export class EditProductDialogComponent {
+  constructor(
+    public dialogRef: MatDialogRef<EditProductDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {}
+  save() { this.dialogRef.close(this.data); }
+  close() { this.dialogRef.close(); }
+}
 
 @Component({
   selector: 'app-farmer-dashboard',
@@ -25,7 +72,12 @@ import { ChangeDetectorRef } from '@angular/core';
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Category</mat-label>
-          <input matInput name="category" [(ngModel)]="newProduct.category" required />
+          <mat-select name="category" [(ngModel)]="newProduct.category" required>
+            <mat-option value="Fruits">Fruits</mat-option>
+            <mat-option value="Vegetables">Vegetables</mat-option>
+            <mat-option value="Dairy">Dairy</mat-option>
+            <mat-option value="Homemade Goods">Homemade Goods</mat-option>
+          </mat-select>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Price</mat-label>
@@ -145,7 +197,7 @@ import { ChangeDetectorRef } from '@angular/core';
       background: #e3f2fd;
     }
   `],
-  imports: [CommonModule, MaterialModule, FormsModule]
+  imports: [CommonModule, MaterialModule, FormsModule, EditProductDialogComponent]
 })
 export class FarmerDashboardComponent implements OnInit {
   products: any[] = [];
@@ -155,7 +207,7 @@ export class FarmerDashboardComponent implements OnInit {
   newProduct: any = { name: '', category: '', price: null, quantity: null };
   successMessage: string = '';
 
-  constructor(private productService: ProductService, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private productService: ProductService, private router: Router, private cdr: ChangeDetectorRef, private dialog: MatDialog) {}
 
   ngOnInit() {
     let farmerId = localStorage.getItem('farmerId');
@@ -215,8 +267,24 @@ export class FarmerDashboardComponent implements OnInit {
   }
 
   editProduct(product: any) {
-    // TODO: Open edit product modal
-    alert('Edit Product modal would open for ' + product.name);
+    const dialogRef = this.dialog.open(EditProductDialogComponent, {
+      width: '500px',
+      data: { ...product }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.productService.updateProduct(product._id, result).subscribe(
+          () => {
+            this.loadProducts();
+            this.successMessage = 'Product updated successfully!';
+            setTimeout(() => this.successMessage = '', 3000);
+          },
+          (error) => {
+            alert('Failed to update product: ' + (error.error?.error || error.message));
+          }
+        );
+      }
+    });
   }
 
   deleteProduct(product: any) {
