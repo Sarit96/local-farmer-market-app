@@ -3,6 +3,8 @@ import { RegisterComponent } from './register/register';
 import { LoginComponent } from './login/login';
 import { HomeComponent } from './home';
 import { FarmerDashboardComponent } from './farmer-dashboard/farmer-dashboard';
+// Import CustomerMarketplaceComponent for marketplace route
+import { CustomerMarketplaceComponent } from './farmer-dashboard/customer-marketplace';
 
 export const routes: Routes = [
   { path: '', component: RegisterComponent },
@@ -10,4 +12,5 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent },
   { path: 'farmer-dashboard', component: FarmerDashboardComponent },
+  { path: 'marketplace', component: CustomerMarketplaceComponent },
 ];

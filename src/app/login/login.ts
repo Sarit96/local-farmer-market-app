@@ -31,7 +31,7 @@ export class LoginComponent {
           localStorage.setItem('farmerId', response.userId);
           this.router.navigate(['/farmer-dashboard']);
         } else if (response.role === 'customer') {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/marketplace']);
         } else {
           this.router.navigate(['/home']);
         }

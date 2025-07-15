@@ -58,6 +58,7 @@ export class EditProductDialogComponent {
   standalone: true,
   template: `
     <div class="dashboard-hero">
+      <button class="logout-btn" mat-raised-button color="primary" (click)="logout()">Logout</button>
       <h1>🌾 Farmer Dashboard</h1>
       <p>Welcome! Manage your products and grow your business with ease.</p>
     </div>
@@ -129,6 +130,15 @@ export class EditProductDialogComponent {
       border-radius: 0 0 24px 24px;
       margin-bottom: 32px;
       box-shadow: 0 4px 24px rgba(24,90,157,0.12);
+      position: relative;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      z-index: 10;
+      padding: 4px 16px;
+      min-width: unset;
     }
     .dashboard-container {
       max-width: 950px;
@@ -294,5 +304,10 @@ export class FarmerDashboardComponent implements OnInit {
         (error) => alert('Failed to delete product: ' + (error.error?.error || error.message))
       );
     }
+  }
+
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 } 
